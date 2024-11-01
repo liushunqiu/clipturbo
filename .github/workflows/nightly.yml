@@ -15,18 +15,13 @@ jobs:
       attestations: write
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
         with:
           repository: ${{ vars.GH_REPOSITORY }}
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
           lfs: true
-
-      - name: Setup Environment Variables
-        shell: bash
-        run: |
-          echo "NUITKA_CACHE_DIR=$GITHUB_WORKSPACE/nuitka/cache" >> $GITHUB_ENV
-          echo "PYTHON_VERSION=$(python --version | awk '{print $2}' | cut -d '.' -f 1,2)" >> $GITHUB_ENV
 
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
@@ -34,18 +29,18 @@ jobs:
           cache: true
           python-version: 3.12
 
-      - name: Cache Project cache directory
+      - name: Cache Project Cache
         uses: actions/cache@v4
         with:
           path: |
             .cache
           key: ${{ runner.os }}-${{ runner.arch }}-clipturbo
 
-      - name: Install dependencies
+      - name: Install Dependencies
         run: |
           pdm install && pdm run setup
 
-      - name: Set nightly version
+      - name: Set Nightly Version
         shell: bash
         run: |
           CURRENT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
@@ -61,7 +56,63 @@ jobs:
           else
             sed -i "s/version = \".*\"/version = \"$NIGHTLY_VERSION\"/" pyproject.toml
           fi
-      - name: Cat project.toml
+
+      - name: Setup Environment Variables
         shell: bash
         run: |
-          cat pyproject.toml
+          echo "NUITKA_CACHE_DIR=$GITHUB_WORKSPACE/nuitka/cache" >> $GITHUB_ENV
+          echo "PYTHON_VERSION=$(python --version | awk '{print $2}' | cut -d '.' -f 1,2)" >> $GITHUB_ENV
+
+      - name: Cache Nuitka Cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUITKA_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ runner.arch }}-python-${{ env.PYTHON_VERSION }}-nuitka-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-python-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-python-
+            ${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Build With Nuitka
+        shell: bash
+        run: |
+          set -e
+          pdm run build
+
+      - name: Compile .ISS to .EXE Installer
+        shell: bash
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          curl -k -O https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl
+          mv ChineseSimplified.isl "C:\Program Files (x86)\Inno Setup 6\Languages"
+          iscc clipturbo.iss
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}
+          path: |
+            dist/*.exe
+          retention-days: 7
+
+      - name: Generate Artifact Attestation
+        continue-on-error: true
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: |
+            dist/*.exe
+
+      - name: Create Nightly Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: ${{ env.NIGHTLY_VERSION }}
+          draft: false
+          prerelease: true
+          tag_name: ${{ env.NIGHTLY_VERSION }}
+          files: |
+            dist/*.exe
+          body: |
+            This is an automated nightly release for testing purposes.
+            Version: ${{ env.NIGHTLY_VERSION }}
+
+            **Warning:** This build may be unstable and is not recommended for production use.
