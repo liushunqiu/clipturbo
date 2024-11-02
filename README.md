@@ -35,26 +35,25 @@ AI: 我们利用 AI 为你处理文案、翻译、图标匹配、TTS 语音合�
 
 在这里选择模板，使用 AI 预处理文案
 
-![image](https://github.com/user-attachments/assets/92be0798-d3b9-4c16-9bc0-2b864b25f11d)
+![workspace](./assets/screenshots/workspace.png)
 
 ### 视频配置
 
 你可以选择任意分辨率、帧率、宽高比或屏幕方向，模板将自动适配。你还可以选择本地字体，上传图片和背景音乐！
 
-![image](https://github.com/user-attachments/assets/4257501b-fa9b-4778-8d32-8c526bfe84b8)
+![video config](./assets/screenshots/video-config.png)
 
 ### 语音配置
 
-内置 EdgeTTS 语音，完全免费，助你随意生成，支持多种人声和语速调节！
+内置 EdgeTTS 语音，完全免费，助你随意生成，支持多种人声和语速调节，适配 Azure、火山云、FishAudio 等多家语音服务！
 
-![image](https://github.com/user-attachments/assets/b1bd361a-579f-44cd-84e2-1c1a5c663181)
+![tts config](./assets/screenshots/tts-config.png)
 
 ### 生成视频
 
 你可以在这里生成和预览生成的视频，字幕文件存放在视频同一目录中。
 
-![image](https://github.com/user-attachments/assets/e0ae268c-32f5-4403-abf7-b2dbc4c7e529)
-
+![generate video](./assets/screenshots/gen-video.png)
 
 ## 版本
 
