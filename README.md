@@ -29,6 +29,9 @@ AI: 我们利用 AI 为你处理文案、翻译、图标匹配、TTS 语音合�
 
 支持的平台: 现在我们的第一优先级是 Windows 系统，稍晚一些会推出 MacOS 客户端，此外我们还有一个即将下线的 [Web 体验版](https://text2motion.himrr.com/)，但强烈建议你使用客户端。
 
+本仓库用于发布小视频宝的 [Release](https://github.com/clipturbo/clipturbo/releases) 版本以及使用 Github Issues 收集和跟进用户反馈。
+
+小视频宝未来是否开源取决于社区反馈，如果你有好的想法，欢迎在 [Issues](https://github.com/clipturbo/clipturbo/issues) 中提出。
 
 ### 近期更新
 
@@ -77,12 +80,6 @@ AI: 我们利用 AI 为你处理文案、翻译、图标匹配、TTS 语音合�
 
 - 前往 [GitHub Release](https://github.com/clipturbo/clipturbo/releases) 下载二进制文件（**推荐**）
 - 在[三花](https://sanhua.himrr.com/clipturbo)官网下载
-
-## 仓库
-
-本仓库用于发布小视频宝的 [Release](https://github.com/clipturbo/clipturbo/releases) 版本以及使用 Github Issues 收集和跟进用户反馈。
-
-小视频宝未来是否开源取决于社区反馈，如果你有好的想法，欢迎在 [Issues](https://github.com/clipturbo/clipturbo/issues) 中提出。
 
 ## License
 
