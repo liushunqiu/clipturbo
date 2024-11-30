@@ -71,4 +71,4 @@ jobs:
         shell: bash
         run: |
           set -e
-          pdm run build --arch=universal
+          pdm run build --arch=x86_64
