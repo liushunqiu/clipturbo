@@ -1,0 +1,72 @@
+name: MacOS Test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-latest
+
+    permissions:
+      id-token: write
+      contents: write
+      attestations: write
+
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.GH_REPOSITORY }}
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+          lfs: true
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          cache: true
+          python-version: 3.12
+
+      - name: Lookup Python
+        shell: bash
+        run: |
+          file $(which python3)
+
+      - name: Cache Project Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache
+          key: ${{ runner.os }}-${{ runner.arch }}-clipturbo
+      - name: Install Dependencies
+        run: |
+          pdm install && pdm run setup
+
+      - name: Set Nightly Version
+        shell: bash
+        run: |
+          CURRENT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+          BASE_VERSION=$(echo $CURRENT_VERSION | sed -E 's/(-[a-zA-Z]+\.[0-9]+)$//')
+          NIGHTLY_DATE=$(date +'%Y%m%d')
+          NIGHTLY_VERSION="${BASE_VERSION}-nightly.${NIGHTLY_DATE}"
+          echo "NIGHTLY_VERSION=$NIGHTLY_VERSION" >> $GITHUB_ENV
+          # Update version in pyproject.toml
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            sed -i "s/version = \".*\"/version = \"$NIGHTLY_VERSION\"/" pyproject.toml
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            sed -i '' "s/version = \".*\"/version = \"$NIGHTLY_VERSION\"/" pyproject.toml
+          else
+            sed -i "s/version = \".*\"/version = \"$NIGHTLY_VERSION\"/" pyproject.toml
+          fi
+
+      - name: Setup Environment Variables
+        shell: bash
+        run: |
+          echo "NUITKA_CACHE_DIR=$GITHUB_WORKSPACE/nuitka/cache" >> $GITHUB_ENV
+          echo "PYTHON_VERSION=$(python --version | awk '{print $2}' | cut -d '.' -f 1,2)" >> $GITHUB_ENV
+
+      - name: Build With Nuitka
+        shell: bash
+        run: |
+          set -e
+          pdm run build
