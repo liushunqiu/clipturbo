@@ -44,6 +44,7 @@ jobs:
       - name: Install Dependencies
         run: |
           pdm install && pdm run setup
+          pdm run nuitka --version
 
       - name: Set Nightly Version
         shell: bash
@@ -68,9 +69,35 @@ jobs:
           echo "NUITKA_CACHE_DIR=$GITHUB_WORKSPACE/nuitka/cache" >> $GITHUB_ENV
           echo "PYTHON_VERSION=$(python --version | awk '{print $2}' | cut -d '.' -f 1,2)" >> $GITHUB_ENV
 
+      - name: Cache Nuitka Cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUITKA_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ runner.arch }}-python-${{ env.PYTHON_VERSION }}-nuitka-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-python-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-python-
+            ${{ runner.os }}-${{ runner.arch }}-
+
       - name: Build With Nuitka
         shell: bash
         run: |
           set -e
-          pdm run nuitka --version
-          pdm run build --arch=x86_64
+          pdm run build --arch=x86_64 --dmg
+          pdm run build --arch=arm64 --dmg
+
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}
+          path: |
+            dist/*.dmg
+          retention-days: 7
+
+      - name: Generate Artifact Attestation
+        continue-on-error: true
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-path: |
+            dist/*.dmg
