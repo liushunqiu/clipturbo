@@ -84,7 +84,6 @@ jobs:
         run: |
           set -e
           pdm run build --arch=x86_64 --dmg
-          pdm run build --arch=arm64 --dmg
 
 
       - name: Upload Artifacts
