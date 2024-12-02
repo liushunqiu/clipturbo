@@ -55,7 +55,7 @@ jobs:
         run: |
           conda activate ./.venv
           conda info
-          conda install -y -c conda-forge pycairo cairo manim
+          conda install -y -c conda-forge pycairo cairo
           brew install create-dmg
 
       - name: Cache Project Cache
