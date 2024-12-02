@@ -36,20 +36,11 @@ jobs:
           cache: true
           python-version: 3.12
 
-      - name: Cache Conda
-        uses: actions/cache@v3
-        env:
-          CACHE_NUMBER: 0
-        with:
-          path: ~/conda_pkgs_dir
-          key:
-            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }} }}
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: ./.venv
           python-version: 3.12
-          use-only-tar-bz2: true
 
       - name: Setup Dependencies
         run: |
