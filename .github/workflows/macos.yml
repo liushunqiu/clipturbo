@@ -5,7 +5,15 @@ on:
 
 jobs:
   build:
-    runs-on: macos-13
+    strategy:
+      matrix:
+        os: [macos-13]
+
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: bash -el {0}
 
     permissions:
       id-token: write
@@ -28,12 +36,27 @@ jobs:
           cache: true
           python-version: 3.12
 
+      - name: Cache Conda
+        uses: actions/cache@v3
+        env:
+          CACHE_NUMBER: 0
+        with:
+          path: ~/conda_pkgs_dir
+          key:
+            ${{ runner.os }}-conda-${{ env.CACHE_NUMBER }} }}
+
+      - uses: conda-incubator/setup-miniconda@v3
+        with:
+          activate-environment: ./.venv
+          python-version: 3.12
+          use-only-tar-bz2: true
+
       - name: Setup Dependencies
-        shell: bash
         run: |
-          file $(which python3)
-          brew install tcl-tk@8 cairo pango pkg-config scipy create-dmg
-          brew link --force tcl-tk@8
+          conda activate ./.venv
+          conda info
+          conda install -y -c conda-forge pycairo cairo manim
+          brew install create-dmg
 
       - name: Cache Project Cache
         uses: actions/cache@v4
@@ -41,6 +64,7 @@ jobs:
           path: |
             .cache
           key: ${{ runner.os }}-${{ runner.arch }}-clipturbo
+
       - name: Install Dependencies
         run: |
           pdm install && pdm run setup
@@ -82,9 +106,7 @@ jobs:
       - name: Build With Nuitka
         shell: bash
         run: |
-          set -e
-          pdm run build --arch=x86_64 --dmg
-
+          pdm run build:x86 --dmg
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
