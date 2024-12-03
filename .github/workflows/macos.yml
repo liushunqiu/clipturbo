@@ -51,7 +51,6 @@ jobs:
           conda info
           conda install -y -c conda-forge cairo pycairo
           brew install create-dmg
-          brew reinstall tcl-tk@8 && brew link --force tcl-tk@8
 
       - name: Cache Project Cache
         uses: actions/cache@v4
