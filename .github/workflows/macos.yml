@@ -61,7 +61,6 @@ jobs:
           pdm run nuitka --version
 
       - name: Set Nightly Version
-        shell: bash
         run: |
           CURRENT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
           BASE_VERSION=$(echo $CURRENT_VERSION | sed -E 's/(-[a-zA-Z]+\.[0-9]+)$//')
@@ -78,7 +77,6 @@ jobs:
           fi
 
       - name: Setup Environment Variables
-        shell: bash
         run: |
           echo "NUITKA_CACHE_DIR=$GITHUB_WORKSPACE/nuitka/cache" >> $GITHUB_ENV
           echo "PYTHON_VERSION=$(python --version | awk '{print $2}' | cut -d '.' -f 1,2)" >> $GITHUB_ENV
@@ -94,14 +92,12 @@ jobs:
             ${{ runner.os }}-${{ runner.arch }}-
 
       - name: Build With Nuitka
-        shell: bash
         if: matrix.os == 'macos-13'
         run: |
           pdm run build:x86 --dmg
         continue-on-error: true
 
       - name: Build With Nuitka
-        shell: bash
         if: matrix.os == 'macos-latest'
         run: |
           pdm run build:arm64 --dmg
