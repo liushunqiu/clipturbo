@@ -35,8 +35,9 @@ jobs:
       - name: Setup Dependencies
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew reinstall --force create-dmg python@3.11 python-tk@3.11
-        continue-on-error: true
+          brew install --force create-dmg
+          brew install python-tk@3.11 || true
+          brew link --overwrite python@3.11
 
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
