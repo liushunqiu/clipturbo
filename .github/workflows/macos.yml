@@ -36,24 +36,11 @@ jobs:
           cache: true
           python-version: 3.12
 
-      - uses: conda-incubator/setup-miniconda@v3
-        if: ${{ runner.os == 'macOS' }}
-        with:
-          activate-environment: ".venv"
-
-      - name: Setup Dependencies
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          pdm venv create -f -w conda 3.12
-          pdm use ./.venv
-          conda activate ./.venv
-          conda info
-          conda install -y -c conda-forge cairo pycairo
-
       - name: Setup Create-DMG
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew install create-dmg
+          brew install --force create-dmg python@3.11 python-tk@3.11
+        continue-on-error: true
 
       - name: Cache Project Cache
         uses: actions/cache@v4
@@ -64,7 +51,14 @@ jobs:
 
       - name: Install Dependencies
         run: |
+          pdm venv create 3.11
+          pdm use ./.venv
           pdm install && pdm run setup
+
+      - name: Patch Nuitka
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          sed -i '' '108s/^/#/' $(pdm run python -c "import inspect;import nuitka.utils.Yaml as n;print(inspect.getfile(n))")
           pdm run nuitka --version
 
       - name: Set Nightly Version
