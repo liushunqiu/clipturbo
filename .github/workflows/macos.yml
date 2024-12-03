@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-13]
+        os: [macos-13, macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -36,7 +36,6 @@ jobs:
           cache: true
           python-version: 3.12
 
-
       - uses: conda-incubator/setup-miniconda@v3
         with:
           activate-environment: ./.venv
@@ -46,7 +45,7 @@ jobs:
         run: |
           conda activate ./.venv
           conda info
-          conda install -y -c conda-forge pycairo cairo
+          conda install -y -c conda-forge cairo
           brew install create-dmg
 
       - name: Cache Project Cache
@@ -96,8 +95,17 @@ jobs:
 
       - name: Build With Nuitka
         shell: bash
+        if: matrix.os == 'macos-13'
         run: |
           pdm run build:x86 --dmg
+        continue-on-error: true
+
+      - name: Build With Nuitka
+        shell: bash
+        if: matrix.os == 'macos-latest'
+        run: |
+          pdm run build:arm64 --dmg
+        continue-on-error: true
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
