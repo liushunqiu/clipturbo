@@ -32,16 +32,17 @@ jobs:
           lfs: true
           ref: macos
 
+      - name: Setup Dependencies
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew reinstall --force create-dmg python@3.11 python-tk@3.11
+        continue-on-error: true
+
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
         with:
           cache: true
           python-version: 3.12
-
-      - name: Setup Create-DMG
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          brew reinstall --force create-dmg python@3.11 python-tk@3.11
 
       - name: Setup Python
         if: ${{ runner.os == 'macOS' }}
