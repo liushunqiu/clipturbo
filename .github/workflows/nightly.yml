@@ -116,7 +116,7 @@ jobs:
       - name: Build With Nuitka
         if: matrix.os == 'macos-13'
         run: |
-          pdm run build:x86 --dmg
+          pdm run build:x86 --dmg --brew-tk
         continue-on-error: true
 
       - name: Build With Nuitka
