@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-13, macos-latest, windows-latest]
+        os: [macos-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -114,7 +114,7 @@ jobs:
       - name: Build With Nuitka
         if: matrix.os == 'macos-latest'
         run: |
-          pdm run build:arm64 --dmg
+          pdm run build:arm64 --dmg --brew-tk
         continue-on-error: true
 
       - name: Upload Artifacts
