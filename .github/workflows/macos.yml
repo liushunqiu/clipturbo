@@ -38,8 +38,12 @@ jobs:
 
       - uses: conda-incubator/setup-miniconda@v3
         with:
-          activate-environment: ./.venv
-          python-version: 3.12
+          activate-environment: ".venv"
+
+      - name: Create Conda Virtual Environment
+        run: |
+          pdm venv create -w -f conda 3.12
+          pdm use ./.venv
 
       - name: Setup Dependencies
         run: |
@@ -58,7 +62,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pdm use ./.venv
           pdm install && pdm run setup
           pdm run nuitka --version
 
