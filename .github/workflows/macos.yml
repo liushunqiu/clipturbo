@@ -37,17 +37,15 @@ jobs:
           python-version: 3.12
 
       - uses: conda-incubator/setup-miniconda@v3
+        if: ${{ runner.os == 'macOS' }}
         with:
           activate-environment: ".venv"
 
-      - name: Create Conda Virtual Environment
-        shell: pwsh
+      - name: Setup Dependencies
+        if: ${{ runner.os == 'macOS' }}
         run: |
           pdm venv create -f -w conda 3.12
           pdm use ./.venv
-
-      - name: Setup Dependencies
-        run: |
           conda activate ./.venv
           conda info
           conda install -y -c conda-forge cairo pycairo
