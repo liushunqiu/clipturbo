@@ -42,7 +42,7 @@ jobs:
 
       - name: Create Conda Virtual Environment
         run: |
-          pdm venv create -w -f conda 3.12
+          pdm venv create -f -w conda 3.12
           pdm use ./.venv
 
       - name: Setup Dependencies
