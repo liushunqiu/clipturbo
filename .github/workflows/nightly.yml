@@ -41,7 +41,7 @@ jobs:
       - name: Setup Create-DMG
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew install --force create-dmg python@3.11 python-tk@3.11
+          brew reinstall --force create-dmg python@3.11 python-tk@3.11
 
       - name: Setup Python
         if: ${{ runner.os == 'macOS' }}
