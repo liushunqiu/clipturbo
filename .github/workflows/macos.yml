@@ -7,7 +7,7 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [macos-latest]
+        os: [windows-latest]
 
     runs-on: ${{ matrix.os }}
 
@@ -40,7 +40,12 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: |
           brew install --force create-dmg python@3.11 python-tk@3.11
-        continue-on-error: true
+
+      - name: Setup Python
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          pdm venv create --force 3.11
+          pdm use ./.venv
 
       - name: Cache Project Cache
         uses: actions/cache@v4
@@ -51,8 +56,6 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pdm venv create --force 3.11
-          pdm use ./.venv
           pdm install && pdm run setup
 
       - name: Patch Nuitka
