@@ -51,7 +51,7 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          pdm venv create 3.11
+          pdm venv create --force 3.11
           pdm use ./.venv
           pdm install && pdm run setup
 
