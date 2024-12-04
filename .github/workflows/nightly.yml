@@ -30,7 +30,6 @@ jobs:
           token: ${{ secrets.GH_PAT }}
           fetch-depth: 0
           lfs: true
-          ref: macos
 
       - name: Setup Dependencies
         if: ${{ runner.os == 'macOS' }}
