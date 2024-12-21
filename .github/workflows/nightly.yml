@@ -34,21 +34,13 @@ jobs:
       - name: Setup Dependencies
         if: ${{ runner.os == 'macOS' }}
         run: |
-          brew install --force create-dmg
-          brew install python-tk@3.11 || true
           brew link --overwrite python@3.11
 
       - name: Setup PDM
         uses: pdm-project/setup-pdm@v4
         with:
-          cache: false
+          cache: true
           python-version: 3.12
-
-      - name: Setup Python
-        if: ${{ runner.os == 'macOS' }}
-        run: |
-          pdm venv create --force 3.11
-          pdm use ./.venv
 
       - name: Cache Project Cache
         uses: actions/cache@v4
@@ -66,7 +58,6 @@ jobs:
         if: ${{ runner.os == 'macOS' }}
         run: |
           sed -i '' '108s/^/#/' $(pdm run python -c "import inspect;import nuitka.utils.Yaml as n;print(inspect.getfile(n))")
-          pdm run nuitka --version
 
       - name: Set Nightly Version
         run: |
@@ -115,13 +106,13 @@ jobs:
       - name: Build With Nuitka
         if: matrix.os == 'macos-13'
         run: |
-          pdm run build:x86 --dmg --brew-tk
+          pdm run build:x86 --dmg
         continue-on-error: true
 
       - name: Build With Nuitka
         if: matrix.os == 'macos-latest'
         run: |
-          pdm run build:arm64 --dmg --brew-tk
+          pdm run build:arm64 --dmg
         continue-on-error: true
 
       - name: Upload Artifacts
