@@ -107,13 +107,11 @@ jobs:
         if: matrix.os == 'macos-13'
         run: |
           pdm run build:x86 --dmg
-        continue-on-error: true
 
       - name: Build With Nuitka
         if: matrix.os == 'macos-latest'
         run: |
           pdm run build:arm64 --dmg
-        continue-on-error: true
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
@@ -126,7 +124,6 @@ jobs:
           retention-days: 7
 
       - name: Generate Artifact Attestation
-        continue-on-error: true
         uses: actions/attest-build-provenance@v1
         with:
           subject-path: |
