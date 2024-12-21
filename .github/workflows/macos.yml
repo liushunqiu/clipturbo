@@ -1,0 +1,120 @@
+name: MacOS Test
+
+on:
+  schedule:
+    - cron: "0 22 * * *"
+  workflow_dispatch:
+
+jobs:
+  build:
+    strategy:
+      matrix:
+        os: [macos-13, macos-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    defaults:
+      run:
+        shell: bash -el {0}
+
+    steps:
+      - name: Checkout Git Repository
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ vars.GH_REPOSITORY }}
+          token: ${{ secrets.GH_PAT }}
+          fetch-depth: 0
+          lfs: true
+          ref: nuitka257
+
+      - name: Setup Dependencies
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          brew install create-dmg
+
+      - name: Setup PDM
+        uses: pdm-project/setup-pdm@v4
+        with:
+          cache: true
+          python-version: 3.12
+
+      - name: Cache Project Cache
+        uses: actions/cache@v4
+        with:
+          path: |
+            .cache
+          key: ${{ runner.os }}-${{ runner.arch }}-${{ hashFiles('scripts/setup.py') }}-clipturbo
+
+      - name: Install Dependencies
+        run: |
+          pdm install && pdm run setup
+          pdm run nuitka --version
+
+      - name: Patch Nuitka
+        if: ${{ runner.os == 'macOS' }}
+        run: |
+          sed -i '' '108s/^/#/' $(pdm run python -c "import inspect;import nuitka.utils.Yaml as n;print(inspect.getfile(n))")
+
+      - name: Set Nightly Version
+        run: |
+          CURRENT_VERSION=$(sed -n 's/^version = "\(.*\)"/\1/p' pyproject.toml)
+          BASE_VERSION=$(echo $CURRENT_VERSION | sed -E 's/(-[a-zA-Z]+\.[0-9]+)$//')
+          NIGHTLY_DATE=$(date +'%Y%m%d')
+          NIGHTLY_VERSION="${BASE_VERSION}-nightly.${NIGHTLY_DATE}"
+          echo "NIGHTLY_VERSION=$NIGHTLY_VERSION" >> $GITHUB_ENV
+          # Update version in pyproject.toml
+          if [[ "$RUNNER_OS" == "Windows" ]]; then
+            sed -i "s/version = \".*\"/version = \"$NIGHTLY_VERSION\"/" pyproject.toml
+          elif [[ "$RUNNER_OS" == "macOS" ]]; then
+            sed -i '' "s/version = \".*\"/version = \"$NIGHTLY_VERSION\"/" pyproject.toml
+          else
+            sed -i "s/version = \".*\"/version = \"$NIGHTLY_VERSION\"/" pyproject.toml
+          fi
+
+      - name: Setup Environment Variables
+        run: |
+          echo "NUITKA_CACHE_DIR=$GITHUB_WORKSPACE/nuitka/cache" >> $GITHUB_ENV
+          echo "PYTHON_VERSION=$(python --version | awk '{print $2}' | cut -d '.' -f 1,2)" >> $GITHUB_ENV
+
+      - name: Cache Nuitka Cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.NUITKA_CACHE_DIR }}
+          key: ${{ runner.os }}-${{ runner.arch }}-python-${{ env.PYTHON_VERSION }}-nuitka-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-${{ runner.arch }}-python-${{ env.PYTHON_VERSION }}-
+            ${{ runner.os }}-${{ runner.arch }}-python-
+            ${{ runner.os }}-${{ runner.arch }}-
+
+      - name: Build With Nuitka
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          pdm run build:x86
+
+      - name: Compile .ISS to .EXE Installer
+        shell: bash
+        if: ${{ runner.os == 'Windows' }}
+        run: |
+          curl -k -O https://raw.githubusercontent.com/jrsoftware/issrc/main/Files/Languages/Unofficial/ChineseSimplified.isl
+          mv ChineseSimplified.isl "C:\Program Files (x86)\Inno Setup 6\Languages"
+          iscc clipturbo.iss
+
+      - name: Build With Nuitka
+        if: matrix.os == 'macos-13'
+        run: |
+          pdm run build:x86 --dmg
+
+      - name: Build With Nuitka
+        if: matrix.os == 'macos-latest'
+        run: |
+          pdm run build:arm64 --dmg
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ runner.os }}-${{ runner.arch }}-clipturbo
+          path: |
+            dist/*.dmg
+            dist/*.zip
+            dist/*.exe
+          retention-days: 7
