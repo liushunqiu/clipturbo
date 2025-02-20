@@ -9,7 +9,7 @@
     🚀 AI 驱动的短视频宝藏工具 - 灵活，快速，易于变现。
     <br />
     <br />
-    <a href="https://sanhua.himrr.com/clipturbo">Website</a>
+    <a href="https://clipturbo.himrr.com/">Website</a>
     ·
     <a href="https://sanhua.himrr.com/sanhua-wx-qrcode.jpg">Wechat</a>
     ·
@@ -27,7 +27,7 @@ AI: 我们利用 AI 为你处理文案、翻译、图标匹配、TTS 语音合�
 
 模板: 得益于 manim ，每个 Scene 都可以是一个模板，我们正在努力提供更多模板。
 
-支持的平台: 现在我们的第一优先级是 Windows 系统，稍晚一些会推出 MacOS 客户端，此外我们还有一个即将下线的 [Web 体验版](https://text2motion.himrr.com/)，但强烈建议你使用客户端。
+支持的平台: 现在我们的第一优先级是 Windows 系统，稍晚一些会推出 MacOS 客户端，此外我们还有一个即将上线的 [Web版](https://clipturbo.himrr.com/)，更多模版陆续推出中。
 
 本仓库用于发布小视频宝的 [Release](https://github.com/clipturbo/clipturbo/releases) 版本以及使用 Github Issues 收集和跟进用户反馈。
 
@@ -37,12 +37,8 @@ AI: 我们利用 AI 为你处理文案、翻译、图标匹配、TTS 语音合�
 
 你可以查看我们的[更新计划和路线图](https://github.com/orgs/clipturbo/projects/1)！
 
-- 现在支持选择输出文件夹
-- 主工作台的 UI 更加简洁，模板简介和模板配置合并到同一 Tab 中
-- 实现了一个 30w 粉博主在用的新模板！
-- 视频自定义背景图片现在支持透明度设置
-- 新增了免费的火山云 TTS 支持
-- 现在有一个设置面板，可以配置 Proxy、管理缓存等
+
+- 网页版本现已上线！直达 ➡️ https://clipturbo.himrr.com
 
 ## 截图
 
