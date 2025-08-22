@@ -21,62 +21,235 @@
 
 ## 关于
 
-小视频宝(ClipTurbo)，一个易于使用的由 AI 驱动短视频生成工具，皆在帮助每个人成为吸粉短视频创作达人，让你的视频轻松变现。
+小视频宝(ClipTurbo)，一个易于使用的由 AI 驱动短视频生成工具，旨在帮助每个人成为吸粉短视频创作达人，让你的视频轻松变现。
 
-AI: 我们利用 AI 为你处理文案、翻译、图标匹配、TTS 语音合成，最终使用 [manim](https://docs.manim.community/) 来渲染视频，告别纯生成式 AI 被平台限流的问题。
+**AI**: 我们利用 AI 为你处理文案、翻译、图标匹配、TTS 语音合成，最终使用 [manim](https://docs.manim.community/) 来渲染视频，告别纯生成式 AI 被平台限流的问题。
 
-模板: 得益于 manim ，每个 Scene 都可以是一个模板，我们正在努力提供更多模板。
+**模板**: 得益于 manim，每个 Scene 都可以是一个模板，我们正在努力提供更多模板。
 
-支持的平台: 现在我们的第一优先级是 Windows 系统，稍晚一些会推出 MacOS 客户端，此外我们还有一个即将上线的 [Web版](https://clipturbo.himrr.com/?utm_source=github&utm_medium=readme)，更多模版陆续推出中。
+**支持的平台**: 现在我们的第一优先级是 Windows 系统，稍晚一些会推出 MacOS 客户端，此外我们还有一个即将上线的 [Web版](https://clipturbo.himrr.com/?utm_source=github&utm_medium=readme)，更多模版陆续推出中。
 
-本仓库用于发布小视频宝的 [Release](https://github.com/clipturbo/clipturbo/releases) 版本以及使用 Github Issues 收集和跟进用户反馈。
+## 🚀 快速开始
 
-小视频宝未来是否开源取决于社区反馈，如果你有好的想法，欢迎在 [Issues](https://github.com/clipturbo/clipturbo/issues) 中提出。
+### 环境要求
 
-### 近期更新
+- Python 3.9+
+- FFmpeg
+- Redis (可选，用于缓存)
+- PostgreSQL (可选，默认使用SQLite)
 
-你可以查看我们的[更新计划和路线图](https://github.com/orgs/clipturbo/projects/1)！
+### 安装步骤
 
+1. **克隆仓库**
+```bash
+git clone https://github.com/clipturbo/clipturbo.git
+cd clipturbo
+```
 
-- 网页版本现已上线！直达 ➡️ [https://clipturbo.himrr.com](https://clipturbo.himrr.com/?utm_source=github&utm_medium=readme)
+2. **安装依赖**
+```bash
+pip install -r requirements.txt
+```
 
-## 截图
+3. **配置环境变量**
+```bash
+cp .env.example .env
+# 编辑 .env 文件，填入你的API密钥
+```
 
-我们还在积极开发中，下面的截图仅供参考。
+4. **启动应用**
+```bash
+python main.py
+```
 
-### 主工作台
+5. **访问应用**
+打开浏览器访问 `http://localhost:8000`
 
-在这里选择模板，使用 AI 预处理文案
+### Docker 部署
 
-![workspace](./assets/screenshots/workspace.png)
+```bash
+# 使用 Docker Compose 一键部署
+docker-compose up -d
+```
 
-### 视频配置
+## 🏗️ 系统架构
 
-你可以选择任意分辨率、帧率、宽高比或屏幕方向，模板将自动适配。你还可以选择本地字体，上传图片和背景音乐！
+ClipTurbo 采用分层架构设计，包含以下核心模块：
 
-![video config](./assets/screenshots/video-config.png)
+### AI 服务层
+- **内容生成**: 支持 OpenAI GPT、本地模型
+- **翻译服务**: 集成 Google Translate、百度翻译、DeepL
+- **图标匹配**: 支持 Unsplash、Pexels、本地素材库
+- **TTS 语音**: 集成 EdgeTTS、Azure、火山云等
 
-### 语音配置
+### 渲染引擎层
+- **Manim 核心**: 基于 Manim 的视频渲染引擎
+- **模板系统**: 灵活的模板管理和自定义
+- **渲染管理**: 队列化渲染，支持并发处理
 
-内置 EdgeTTS 语音，完全免费，助你随意生成，支持多种人声和语速调节，适配 Azure、火山云、FishAudio 等多家语音服务！
+### 业务逻辑层
+- **项目管理**: 完整的项目生命周期管理
+- **工作流引擎**: 自动化的视频生成流程
+- **资源管理**: 统一的资源文件管理
 
-![tts config](./assets/screenshots/tts-config.png)
+## 📖 API 文档
 
-### 生成视频
+启动应用后，访问 `http://localhost:8000/docs` 查看完整的 API 文档。
 
-你可以在这里生成和预览生成的视频，字幕文件存放在视频同一目录中。
+### 主要 API 端点
 
-![generate video](./assets/screenshots/gen-video.png)
+- `POST /api/generate` - 生成视频
+- `GET /api/templates` - 获取模板列表
+- `POST /api/projects` - 创建项目
+- `GET /api/workflows/{id}` - 查看工作流状态
 
-## 版本
+## 🎨 模板系统
 
-目前，小视频宝仍处于早期开发人员预览阶段 （alpha），仅提供给[三花 AI](https://sanhua.himrr.com/) 的注册用户提供。
+ClipTurbo 提供了灵活的模板系统，支持：
 
-使用微信打开三花官网后将自动注册，然后你可以选择下面任意一个方法来使用：
+### 内置模板
+- **简单文本**: 基础的文本展示模板
+- **列表展示**: 适合展示要点、步骤的模板
+- **更多模板**: 持续添加中...
 
-- 前往 [GitHub Release](https://github.com/clipturbo/clipturbo/releases) 下载二进制文件（**推荐**）
-- 在[三花](https://sanhua.himrr.com/clipturbo)官网下载
+### 自定义模板
+```python
+from src.manim_engine import VideoTemplate, TemplateMetadata
 
-## License
+class MyCustomTemplate(VideoTemplate):
+    def get_metadata(self):
+        return TemplateMetadata(
+            id="my_template",
+            name="我的模板",
+            description="自定义模板描述",
+            category="custom"
+        )
+    
+    def create_scene(self, params):
+        # 实现你的场景逻辑
+        pass
+```
 
-GNU General Public License version 3
+## 🔧 配置说明
+
+主要配置文件：
+- `config.yaml` - 应用主配置
+- `.env` - 环境变量和API密钥
+- `requirements.txt` - Python依赖
+
+### 重要配置项
+
+```yaml
+# AI服务配置
+ai_services:
+  content_generator:
+    openai:
+      api_key: "${OPENAI_API_KEY}"
+      model: "gpt-3.5-turbo"
+
+# 渲染配置
+manim_engine:
+  render_manager:
+    max_concurrent_renders: 2
+    output_dir: "./output/videos"
+```
+
+## 📊 使用示例
+
+### 1. 生成简单文本视频
+
+```python
+import requests
+
+response = requests.post("http://localhost:8000/api/generate", json={
+    "topic": "如何学习Python",
+    "requirements": {
+        "style": "educational",
+        "duration": 30,
+        "template_id": "simple_text"
+    }
+})
+
+workflow_id = response.json()["workflow_id"]
+```
+
+### 2. 查看生成进度
+
+```python
+status = requests.get(f"http://localhost:8000/api/workflows/{workflow_id}")
+print(status.json())
+```
+
+## 🛠️ 开发指南
+
+### 项目结构
+```
+clipturbo/
+├── src/
+│   ├── ai_services/          # AI服务模块
+│   ├── manim_engine/         # Manim渲染引擎
+│   └── core/                 # 核心业务逻辑
+├── templates/                # 视频模板
+├── config.yaml              # 配置文件
+├── main.py                   # 应用入口
+└── requirements.txt          # 依赖列表
+```
+
+### 添加新的AI服务
+
+1. 在 `src/ai_services/` 下创建新的服务模块
+2. 继承相应的抽象基类
+3. 在配置文件中添加服务配置
+4. 在 `AIOrchestrator` 中集成新服务
+
+### 创建新模板
+
+1. 继承 `VideoTemplate` 基类
+2. 实现必要的方法
+3. 将模板文件放在 `templates/` 目录下
+4. 重启应用自动加载
+
+## 🤝 贡献指南
+
+我们欢迎社区贡献！请遵循以下步骤：
+
+1. Fork 本仓库
+2. 创建特性分支 (`git checkout -b feature/AmazingFeature`)
+3. 提交更改 (`git commit -m 'Add some AmazingFeature'`)
+4. 推送到分支 (`git push origin feature/AmazingFeature`)
+5. 开启 Pull Request
+
+## 📝 更新日志
+
+### v1.0.0 (2024-01-XX)
+- 🎉 首个正式版本发布
+- ✨ 完整的AI驱动视频生成流程
+- 🎨 内置多种视频模板
+- 🔧 灵活的配置系统
+- 📊 完整的API文档
+
+## 🐛 问题反馈
+
+如果你遇到问题或有建议，请：
+
+1. 查看 [FAQ](https://github.com/clipturbo/clipturbo/wiki/FAQ)
+2. 搜索现有的 [Issues](https://github.com/clipturbo/clipturbo/issues)
+3. 创建新的 Issue 并提供详细信息
+
+## 📄 许可证
+
+本项目采用 [GNU General Public License v3.0](LICENSE) 许可证。
+
+## 🙏 致谢
+
+感谢以下开源项目：
+- [Manim](https://github.com/ManimCommunity/manim) - 数学动画引擎
+- [FastAPI](https://github.com/tiangolo/fastapi) - 现代Web框架
+- [OpenAI](https://openai.com/) - AI服务支持
+
+---
+
+<div align="center">
+  <p>如果这个项目对你有帮助，请给我们一个 ⭐️</p>
+  <p>Made with ❤️ by ClipTurbo Team</p>
+</div>

@@ -1,0 +1,133 @@
+# ClipTurbo Configuration File
+
+# Application Settings
+app:
+  name: "ClipTurbo"
+  version: "1.0.0"
+  debug: false
+  host: "0.0.0.0"
+  port: 8000
+
+# AI Services Configuration (可选服务)
+ai_services:
+  # Content Generator (内容生成 - 需要OpenAI API密钥)
+  content_generator:
+    openai:
+      api_key: "${OPENAI_API_KEY}"
+      model: "gpt-3.5-turbo"
+  
+  # TTS Services (语音合成 - 推荐使用免费的EdgeTTS)
+  tts:
+    cache_enabled: true
+    output_dir: "./output/audio"
+    # EdgeTTS (免费，无需配置)
+    edge_tts:
+      enabled: true
+    # Azure TTS (可选，需要API密钥)
+    azure:
+      subscription_key: "${AZURE_TTS_KEY}"
+      region: "${AZURE_TTS_REGION}"
+  
+  # Translation Services (ModelScope英译中)
+  translation:
+    cache_enabled: true
+  
+  # Icon Matching (可选，用于自动匹配图片)
+  icon_matcher:
+    cache_enabled: true
+    # 本地图片库
+    local:
+      icon_directory: "./assets/icons"
+    # 在线图片服务 (可选)
+    unsplash:
+      access_key: "${UNSPLASH_ACCESS_KEY}"
+    pexels:
+      api_key: "${PEXELS_API_KEY}"
+
+# Manim Engine Configuration
+manim_engine:
+  # Template System
+  template_system:
+    template_directory: "./templates"
+    builtin_templates_enabled: true
+  
+  # Render Manager
+  render_manager:
+    max_concurrent_renders: 2
+    output_dir: "./output/videos"
+    temp_dir: "./temp"
+    quality_presets:
+      low:
+        pixel_height: 480
+        pixel_width: 854
+        frame_rate: 15
+      medium:
+        pixel_height: 720
+        pixel_width: 1280
+        frame_rate: 24
+      high:
+        pixel_height: 1080
+        pixel_width: 1920
+        frame_rate: 30
+      production:
+        pixel_height: 1080
+        pixel_width: 1920
+        frame_rate: 60
+
+# Project Management
+project_manager:
+  projects_dir: "./projects"
+  auto_backup: true
+  backup_interval_hours: 24
+  max_backups: 10
+
+# Workflow Engine
+workflow_engine:
+  max_concurrent_workflows: 3
+  cleanup_interval_hours: 24
+  max_workflow_age_hours: 168  # 7 days
+
+# Database Configuration
+database:
+  url: "sqlite:///./clipturbo.db"
+  echo: false
+  pool_size: 10
+  max_overflow: 20
+
+# Redis Configuration (for caching and task queue)
+redis:
+  host: "localhost"
+  port: 6379
+  db: 0
+  password: "${REDIS_PASSWORD}"
+
+# Logging Configuration
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "./logs/clipturbo.log"
+  max_file_size: "10MB"
+  backup_count: 5
+
+# Security Settings
+security:
+  secret_key: "${SECRET_KEY}"
+  access_token_expire_minutes: 30
+  allowed_origins:
+    - "http://localhost:3000"
+    - "http://127.0.0.1:3000"
+
+# File Upload Settings
+upload:
+  max_file_size: 100  # MB
+  allowed_extensions:
+    images: [".jpg", ".jpeg", ".png", ".gif", ".webp", ".svg"]
+    audio: [".mp3", ".wav", ".m4a", ".aac"]
+    fonts: [".ttf", ".otf", ".woff", ".woff2"]
+  upload_dir: "./uploads"
+
+# Performance Settings
+performance:
+  max_workers: 4
+  request_timeout: 300  # seconds
+  max_request_size: 100  # MB
