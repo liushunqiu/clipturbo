@@ -457,8 +457,12 @@ class WorkflowEngine:
             'production_quality': RenderQuality.PRODUCTION
         }
         
+        # 获取质量设置，默认为中等质量
+        quality_str = requirements.get('quality', 'medium_quality')
+        quality = quality_map.get(quality_str, RenderQuality.MEDIUM)
+        
         render_config = RenderConfig(
-            quality=quality_map.get(requirements.get('quality', 'medium_quality'), RenderQuality.MEDIUM),
+            quality=quality,
             resolution=requirements.get('resolution', (1920, 1080)),
             frame_rate=requirements.get('frame_rate', 30),
             background_color=requirements.get('background_color', 'BLACK')

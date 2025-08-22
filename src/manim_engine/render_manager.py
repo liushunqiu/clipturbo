@@ -100,7 +100,8 @@ class RenderManager:
         self.output_dir.mkdir(exist_ok=True)
         
         # 临时目录
-        self.temp_dir = Path(config.get('temp_dir', tempfile.gettempdir())) / 'clipturbo_render'
+        temp_base = Path(config.get('temp_dir', tempfile.gettempdir()))
+        self.temp_dir = temp_base / 'clipturbo_render'
         self.temp_dir.mkdir(exist_ok=True)
         
         # 质量预设
@@ -109,25 +110,25 @@ class RenderManager:
                 'pixel_height': 480,
                 'pixel_width': 854,
                 'frame_rate': 15,
-                'quality': 'low_quality'
+                'quality': 'l'
             },
             RenderQuality.MEDIUM: {
                 'pixel_height': 720,
                 'pixel_width': 1280,
                 'frame_rate': 24,
-                'quality': 'medium_quality'
+                'quality': 'm'
             },
             RenderQuality.HIGH: {
                 'pixel_height': 1080,
                 'pixel_width': 1920,
                 'frame_rate': 30,
-                'quality': 'high_quality'
+                'quality': 'h'
             },
             RenderQuality.PRODUCTION: {
                 'pixel_height': 1080,
                 'pixel_width': 1920,
                 'frame_rate': 60,
-                'quality': 'production_quality'
+                'quality': 'k'
             }
         }
         
@@ -258,25 +259,22 @@ class RenderScene(Scene):
     def _build_manim_command(self, job: RenderJob) -> List[str]:
         """构建manim命令"""
         config = job.config
-        quality_preset = self.quality_presets[config.quality.value]
+        quality_preset = self.quality_presets[config.quality]
         
         cmd = [
-            'manim',
+            'python3', '-m', 'manim',
             job.scene_file,
             'RenderScene',  # 场景类名
+            f'-o', str(Path(job.output_path).parent),
             f'--quality={quality_preset["quality"]}',
             f'--resolution={config.resolution[0]},{config.resolution[1]}',
             f'--frame_rate={config.frame_rate}',
-            f'--output_file={job.output_path}',
+            f'--format={config.output_format}',
         ]
         
-        # 预览模式
+        # 预览模式 (使用低质量)
         if config.preview_mode:
-            cmd.append('--preview')
-        
-        # 背景颜色
-        if config.background_color:
-            cmd.append(f'--background_color={config.background_color}')
+            cmd.append('--quality=l')
         
         # 自定义参数
         cmd.extend(config.custom_flags)
